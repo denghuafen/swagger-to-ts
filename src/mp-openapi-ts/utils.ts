@@ -151,11 +151,45 @@ export function parseSingleSimpleValue(
   // Edge case
   return `${value}`;
 }
+export function tsType(type?: string): SchemaObjectType {
+  // boolean
+  if (type === "boolean") {
+    return "boolean";
+  }
 
+  // string
+  if (
+    type === "string" ||
+    type === "binary" ||
+    type === "byte" ||
+    type === "date" ||
+    type === "dateTime" ||
+    type === "password"
+  ) {
+    return "string";
+  }
+
+  // number
+  if (
+    type === "integer" ||
+    type === "number" ||
+    type === "float" ||
+    type === "double"
+  ) {
+    return "number";
+  }
+
+  // array
+  if (type === "array") {
+    return "Array";
+  }
+  return "unknown";
+}
 /** Return type of node (works for v2 or v3, as there are no conflicting types) */
 type SchemaObjectType =
   | "anyOf"
   | "array"
+  | "Array"
   | "boolean"
   | "const"
   | "enum"
@@ -336,4 +370,28 @@ export function replaceKeys(obj: Record<string, any>): Record<string, any> {
   } else {
     return obj;
   }
+}
+
+// 判断是否全是中文
+function isChinese(temp: string) {
+  const re = /[^\u4e00-\u9fa5]/;
+  if (re.test(temp)) return false;
+  return true;
+}
+
+/**
+ *
+ * 目的一：分离 ResultVO«PageVO«PageMessageVo»» 这样的形式
+ * 目的而：替换中文为英文
+ */
+let chineseIndex = 1;
+let genericityFlag = "«";
+export function dealInterfaceName(interfaceName: string) {
+  // if (isChinese(interfaceName)) {
+  //   interfaceName = `ChineseName${chineseIndex++}`;
+  // }
+  if (interfaceName.indexOf("«") > -1) {
+    interfaceName = interfaceName.replace(/«/g, "<").replace(/»/g, ">");
+  }
+  return interfaceName;
 }

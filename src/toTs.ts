@@ -13,7 +13,6 @@ const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenA
   fs.writeFileSync("test.ts", output);
   console.log(output, "...ee");
 })();
-// (async function () {
-//   const output = await openapiTS(JSON.parse(schema));
-//   console.log(output, "..output");
-// })();
+
+
+

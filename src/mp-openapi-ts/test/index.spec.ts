@@ -20,3 +20,5 @@ const schema: SchemaObject = {
 const output = transformSchemaObj(schema);
 console.log(output);
 
+
+
