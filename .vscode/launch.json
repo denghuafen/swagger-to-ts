@@ -9,7 +9,31 @@
                 "ts-node/register"
             ],
             "args": [
+                "${workspaceFolder}/src/mp-openapi-ts/index.ts"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "toTs--thrid",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
                 "${workspaceFolder}/src/toTs.ts"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "spec-test",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/mp-openapi-ts/test/index.spec.ts"
             ]
         }
     ]

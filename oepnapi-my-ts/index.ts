@@ -68,7 +68,7 @@ async function openapiTS(
     httpHeaders: options.httpHeaders,
     httpMethod: options.httpMethod,
   });
-
+  
   for (const k of Object.keys(allSchemas)) {
     const rootSchemaID = isInlineSchema ? VIRTUAL_JSON_URL : schemaURL.href;
     if (k === rootSchemaID) {
