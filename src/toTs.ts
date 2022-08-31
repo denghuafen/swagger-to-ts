@@ -10,8 +10,7 @@ const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenA
   >);
   const output = await openapiTS.default(JSON.parse(schema));
 
-  fs.writeFileSync("test.ts", output);
-  console.log(output, "...ee");
+  fs.writeFileSync("output/result-other.ts", output);
 })();
 
 

@@ -25,9 +25,8 @@ const httpMethods = [
 ] as const;
 
 const includeKey = ["paths", "definitions", "tags"];
-export default function apiTS(scheme: string, path?: string): string {
+export default function apiTS(scheme: string, path: string): string {
   console.log("生成路径：", path);
-
   const schemeObj: Record<string, any> = {};
   const tempObj = JSON.parse(scheme);
   Object.keys(tempObj).forEach((k) => {
@@ -35,21 +34,9 @@ export default function apiTS(scheme: string, path?: string): string {
       schemeObj[k] = tempObj[k];
     }
   });
-  if (path) {
-    schemeObj.paths = {
-      [path]: schemeObj.paths[path],
-    };
-  }
-  // const newSchemeObj = JSON.parse(JSON.stringify(schemeObj), (k, v) => {
-  //   if (k !== "$ref" || typeof v !== "string") return;
-  //   const { url, parts } = parseRef(v);
-  //   if (url) {
-  //     console.log(`存在${url}，做些什么呢。。。`);
-  //   }
-  //   const [base, ...rest] = parts;
-  //   return `${base}["${rest.join('"]["')}"]`;
-  // });
-
+  schemeObj.paths = {
+    [path]: schemeObj.paths[path],
+  };
   return transformAll(schemeObj);
 }
 
@@ -73,7 +60,7 @@ function transformPathsObj(paths: Record<string, PathItemObject>): string {
   for (const [url, pathItem] of Object.entries(paths)) {
     output += comment(url);
     const interfaceKey = upperCamelCaseByPath(url || `IDefault${curIndex++}`);
-    output += `interface ${interfaceKey} { \n`;
+    output += `namespace ${interfaceKey} { \n`;
     // 这里for循环可以删除，不影响整体结构
     for (const method of httpMethods) {
       const methodItem = pathItem[method];
@@ -135,7 +122,7 @@ function transformDefinitions(
 function transformPathsParameters(
   parameters: (ReferenceObject | ParameterObject)[]
 ): string {
-  let output = "  paramInterface: { \n";
+  let output = "  interface RequestParams { \n";
   for (const paramItem of parameters) {
     const { description, name, schema, type } = paramItem as ParameterObject;
     if (description) {
@@ -151,7 +138,7 @@ function transformPathsParameters(
       output += `${transformSchemaObj(schema)};\n`;
     }
   }
-  return `${output}  } \n`;
+  return `${output} }\n`;
 }
 let reponseIndex = 1;
 // 转化接口url中的返回数据

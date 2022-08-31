@@ -10,7 +10,8 @@ import openapiTS from "openapi-typescript";
     const downloadedFileName = "project-openapi.json";
 
     const { data } = await axios.get(
-      "http://wenwo-cloud-adaptor-biz-domain-platform-dev.wenwo.cn/v2/api-docs",
+      // "http://wenwo-cloud-adaptor-biz-domain-platform-dev.wenwo.cn/v2/api-docs",
+      "http://10.97.59.93:55001/v2/api-docs",
       {
         headers: {},
         responseType: "text",
@@ -22,7 +23,7 @@ import openapiTS from "openapi-typescript";
     // const schema = await fs.promises.readFile("project-openapi.json", "utf8"); // must be OpenAPI JSON
     // const output = await openapiTS(JSON.parse(schema));
     // console.error(output,"...output.");
-    
+
     // const generatedTypes = await generateApi({
     //   name: `${generatedTypeFileName}`,
     //   input: path.resolve(directory, downloadedFileName),
