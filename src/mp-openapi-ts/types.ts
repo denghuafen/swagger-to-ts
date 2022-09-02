@@ -66,7 +66,13 @@ export interface OperationObject {
 
 export interface ParameterObject {
   name?: string; // required
-  in?: "query" | "header" | "path" | /* V3 */ "cookie" | /* V2 */ "formData" | /* V2 */ "body"; // required
+  in?:
+    | "query"
+    | "header"
+    | "path"
+    | /* V3 */ "cookie"
+    | /* V2 */ "formData"
+    | /* V2 */ "body"; // required
   description?: string;
   required?: boolean;
   deprecated?: boolean;
@@ -190,4 +196,15 @@ export interface GlobalContext {
   silent?: boolean;
   supportArrayLength?: boolean;
   version: number;
+}
+
+export interface SourceTargetMap {
+  target?: string;
+  source?: string;
+  interfaceStr?: string;
+}
+
+export interface RefParts {
+  name: string;
+  children: RefParts[];
 }

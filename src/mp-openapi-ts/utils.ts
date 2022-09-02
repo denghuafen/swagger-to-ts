@@ -1,3 +1,5 @@
+export const regGeneric = /((?!\«).*?)\«((?!\»).*?)\»$/;
+
 /**
  * 通过路径生成大驼峰
  * @param path /biz/account/role/del
@@ -20,7 +22,14 @@ export function upperCamelCaseByPath(path: string) {
   return pathArr.join("");
 }
 
-import type { OpenAPI2, OpenAPI3, ReferenceObject } from "./types.js";
+import type {
+  OpenAPI2,
+  OpenAPI3,
+  ReferenceObject,
+  RefParts,
+  SchemaObject,
+  SourceTargetMap,
+} from "./types.js";
 
 type CommentObject = {
   const?: boolean; // jsdoc without value
@@ -374,9 +383,9 @@ export function replaceKeys(obj: Record<string, any>): Record<string, any> {
 
 // 判断是否全是中文
 function isChinese(temp: string) {
-  const re = /[^\u4e00-\u9fa5]/;
-  if (re.test(temp)) return false;
-  return true;
+  const re = /^[\u4e00-\u9fa5]+$/g;
+  if (re.test(temp)) return true;
+  return false;
 }
 
 /**
@@ -387,11 +396,90 @@ function isChinese(temp: string) {
 let chineseIndex = 1;
 let genericityFlag = "«";
 export function dealInterfaceName(interfaceName: string) {
-  // if (isChinese(interfaceName)) {
-  //   interfaceName = `ChineseName${chineseIndex++}`;
-  // }
   if (interfaceName.indexOf("«") > -1) {
     interfaceName = interfaceName.replace(/«/g, "<").replace(/»/g, ">");
   }
   return interfaceName;
 }
+
+let chineseGeneriIndex = 1;
+
+export const sourceMapTarget = new Map<string, SourceTargetMap>();
+export function transformChart(sourceStr: string, interfaceStr: string = "") {
+  // 包含中文字符
+  const includeChinese = /[\u4e00-\u9fa5]/g;
+  // 全是中文字符
+  // const allChinese = /^[\u4e00-\u9fa5]+$/g;
+  // 包含括号
+  const includeParentheses = /\(|\)/g;
+  let target = "";
+  if (includeParentheses.test(sourceStr) || includeChinese.test(sourceStr)) {
+    const targetObj = sourceMapTarget.get(sourceStr);
+    if (targetObj && targetObj.target) {
+      // target = sourceMapTarget.get(sourceStr).target;
+      target = targetObj.target;
+    } else {
+      target = `Custom${chineseGeneriIndex++}`;
+      sourceMapTarget.set(sourceStr, {
+        source: sourceStr,
+        target,
+        interfaceStr,
+      });
+    }
+  }
+  return target;
+}
+// 处理数据结构名称
+export function formatDataStrucName(interName: string) {
+  const reg = /((?!\<).*?)\<((?!\>).*?)\>$/;
+  const result = interName.match(reg);
+  if (result) {
+    const subGroup = result[1];
+    const subGroupGeneric = result[2];
+    interName = `${transformChart(subGroup)}<${formatDataStrucName(
+      subGroupGeneric
+    )}>`;
+  } else {
+    // 没有泛型
+    interName = transformChart(interName);
+  }
+  return interName;
+}
+// 是否包含类似的泛型的结构
+export function isGeneric(name: string) {
+  const reg = /((?!\«).*?)\«((?!\»).*?)\»$/;
+  return reg.test(name);
+}
+export function createGenericInterfaceName(name: string) {
+  const reg = /((?!\«).*?)\«((?!\»).*?)\»$/;
+
+  const nameArr = name.match(reg);
+  if (!nameArr) return name;
+  return `${nameArr[1]}<T>`;
+}
+export function isReferenObj(items?: SchemaObject | ReferenceObject) {
+  return items && !!(items as ReferenceObject).$ref;
+}
+// export function parseRefPartsName(refPartsName: string) {
+//   // 生成数据结构
+//   function parseGeneric(name: string): RefParts {
+//     const reg = /((?!\«).*?)\«((?!\»).*?)\»$/;
+//     const nameRegArr = name.match(reg);
+//     if (nameRegArr) {
+//       const childrenAim = [];
+//       childrenAim.push(parseGeneric(nameRegArr[2]));
+//       return {
+//         name: nameRegArr[1],
+//         children: childrenAim,
+//       };
+//     } else {
+//       return { name: name, children: [] };
+//     }
+//   }
+
+//   const result = parseGeneric(refPartsName);
+//   console.dir(result);
+//   console.log(result.children[0].children);
+
+//   return result;
+// }

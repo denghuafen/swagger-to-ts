@@ -3,6 +3,31 @@
  * Do not make direct changes to the file.
  */
 
+const path: paths = {
+  // "/api/pcd/channel/activity/getList": {
+  //   post: {
+  //     parameters: {
+  //       body: {
+  //         frm: {},
+  //       },
+  //     },
+  //     responses: {
+  //       "200": {
+  //         schema: {
+  //           // data: {},
+  //           message: "2",
+  //           status: 1,
+  //         },
+  //       },
+  //     },
+  //   },
+  // },
+};
+
+type HttpMethods = "post"|"get";
+
+
+// const inter: PathInter<"/api/pcd/channel/activity/disable"> = {};
 export interface paths {
   "/api/pcd/channel/activity/disable": {
     post: operations["disableUsingPOST"];
@@ -945,7 +970,10 @@ export interface paths {
     get: operations["redirctUsingGET"];
   };
 }
-
+type A = definitions["ActivityH5Response"]
+const a: A = {
+  
+}
 export interface definitions {
   /** AccountBinding */
   AccountBinding: {

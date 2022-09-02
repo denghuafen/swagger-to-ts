@@ -1,7 +1,6 @@
 import fs from "fs";
 // 这样导入一直报错。。。
 // import openapiTS from "openapi-typescript";
-// import openapiTS from "../oepnapi-my-ts/index";
 const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenAPI JSON
 
 (async () => {
