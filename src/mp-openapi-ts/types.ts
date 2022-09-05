@@ -7,7 +7,16 @@ export interface OpenAPI2 {
   parameters?: ParameterObject[];
   responses?: Record<string, ResponseObject>; // required
 }
-
+export interface RefTree {
+  /** definition中定义的名称 */
+  refPartName: string;
+  /**格式化后用于作为属性值的名称 */
+  formatName: string;
+  /**definition生成的接口完整字符串 */
+  interfaceStr: string;
+  /** 生成interface的名称 */
+  interfaceName: string;
+}
 export interface OpenAPI3 {
   openapi: string; // required
   paths?: Record<string, PathItemObject>; // required

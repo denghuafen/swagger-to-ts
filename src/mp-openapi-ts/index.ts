@@ -1,8 +1,13 @@
 import {
+  parseRefRecordObj,
+  transfromReferenceObj,
+} from "./transformDefinition";
+import {
   OpenAPI2,
   ParameterObject,
   PathItemObject,
   ReferenceObject,
+  RefTree,
   ResponseObject,
   SchemaObject,
 } from "./types";
@@ -19,13 +24,15 @@ const httpMethods = [
 ] as const;
 
 const includeKey = ["paths", "definitions", "tags"];
-export let globalSchemeObj: Record<string, any> | null = null;
+export let globalSchemeObj: OpenAPI2 | null = null;
 export default function apiTS(
   scheme: string,
   path?: string
 ): { output: string; other: string } {
   console.log("生成路径：", path);
-  const schemeObj: Record<string, any> = {};
+  const schemeObj: OpenAPI2 & { [index: string]: unknown } = {
+    swagger: "",
+  };
   const tempObj = JSON.parse(scheme);
   Object.keys(tempObj).forEach((k) => {
     if (includeKey.includes(k)) {
@@ -34,7 +41,7 @@ export default function apiTS(
   });
   if (path) {
     schemeObj.paths = {
-      [path]: schemeObj.paths[path],
+      [path]: schemeObj.paths ? schemeObj.paths[path] : {},
     };
   }
   return {
@@ -42,7 +49,7 @@ export default function apiTS(
     other: "",
   };
 }
-function transformAll(schemeObj: Record<string, any>): string {
+function transformAll(schemeObj: OpenAPI2): string {
   globalSchemeObj = schemeObj;
   let output = "";
   if (schemeObj.paths) {
@@ -81,7 +88,9 @@ function transformPathsObj(paths: Record<string, PathItemObject>): string {
         }
       }
     }
-    output += parseRefRecordObj();
+    if (globalSchemeObj) {
+      output += parseRefRecordObj(globalSchemeObj);
+    }
     output += `\n}`;
   }
   return output;
@@ -111,7 +120,7 @@ function transformParameters(
     if (type) {
       output += `${tsType(type)};\n`;
     } else if (enumKey) {
-      output += `${enumKey.join("|")}`;
+      output += `${enumKey.map((item) => `"${item}"`).join("|")}`;
     } else if (schema || items) {
       output += `${parseSchemaReferenceObject(schema || items)};\n`;
     }
@@ -194,110 +203,4 @@ export function transformSchemaObj(schema: SchemaObject): string {
   }
 
   return output;
-}
-
-interface RefTree {
-  // definition中定义的名称
-  refPartName: string;
-  // 格式化后用于作为属性值的名称
-  formatName: string;
-  // definition生成的接口字符串
-  interfaceStr: string;
-  // 生成interface的名称
-  interfaceName: string;
-  // children: Array<RefTree>;
-}
-const refTreeMap = new Map<string, RefTree>();
-function parseRefRecordObj() {
-  let output = "";
-  for (const [key, value] of refTreeMap) {
-    if (!value.interfaceStr) {
-      // 生成接口(interfaceStr)
-      value.interfaceStr += createTypeStrByDefinition(
-        value.refPartName,
-        value.interfaceName,
-        globalSchemeObj as OpenAPI2
-      );
-    }
-    output += `${value.interfaceStr} \n`;
-  }
-  return output;
-}
-
-function createTypeStrByDefinition(
-  refName: string,
-  formatName: string,
-  schemaObj: OpenAPI2
-) {
-  if (!schemaObj.definitions) return "";
-  let output = `interface ${formatName} {\n`;
-  const definitionObj = schemaObj.definitions[refName];
-  output += parseSchemaReferenceObject(definitionObj);
-  output += `\n };`;
-  return output;
-}
-
-function setRefMap(refName: string) {
-  let newStr = formatDefinitionName(refName);
-  const res = newStr.match(/((?!\<).*?)\<((?!\>).*?)\>$/);
-  // if (res) {
-  //   newStr = `${res[1]}<T = ${res[2]}>`;
-  // }
-  refTreeMap.set(refName, {
-    refPartName: refName,
-    interfaceStr: "",
-    formatName: newStr,
-    interfaceName: res ? `${res[1]}<T = ${res[2]}>` : newStr,
-  });
-  return refTreeMap.get(refName);
-}
-// 解析$ref对应的字符串
-// 是作为属性key的value存在的，不需要适用T来替代泛型
-// partStr可能性结果：Map«string,string»、PageVO«DistCommunityList»、List«DistCommunityList»
-export function transfromReferenceObj(schema: ReferenceObject): string {
-  const { parts } = parseRef(schema.$ref);
-  const partStr = parts[parts.length - 1];
-  let refMapObj = refTreeMap.get(partStr);
-  if (refMapObj) {
-    return refMapObj.formatName;
-  } else {
-    return setRefMap(partStr)!.formatName;
-  }
-}
-let chineseGeneriIndex = 1;
-function formatDefinitionName(refName: string) {
-  let newStr = refName
-    .replace(/«/g, "<")
-    .replace(/»/g, ">")
-    .replace(/List/g, "Array")
-    .replace(/Map/g, "Record")
-    .replace(/<Void>/g, "");
-  // 包含中文字符
-  const includeChinese = /[\u4e00-\u9fa5]/g;
-  // 全是中文字符
-  const allChinese = /^[\u4e00-\u9fa5]+$/g;
-  // 包含括号
-  const includeParentheses = /\(|\)/g;
-  if (allChinese.test(newStr)) {
-    newStr = newStr.replace(allChinese, `Custom${chineseGeneriIndex++}`);
-  }
-  if (includeParentheses.test(newStr) || includeChinese.test(newStr)) {
-    newStr = newStr.replace(includeChinese, "").replace(includeParentheses, "");
-  }
-  // 处理泛型格式的ref名称
-  // newStr = formatGenericDataStrucName(newStr);
-  return newStr;
-}
-
-function formatGenericDataStrucName(interName: string) {
-  const reg = /((?!\<).*?)\<((?!\>).*?)\>$/;
-  const result = interName.match(reg);
-  if (result) {
-    const subGroup = result[1];
-    const subGroupGeneric = result[2];
-    interName = `${subGroup}<T = ${formatGenericDataStrucName(
-      subGroupGeneric
-    )}>`;
-  }
-  return interName;
 }
