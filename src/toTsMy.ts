@@ -1,19 +1,19 @@
 import fs from "fs";
-import apiTS from "./mp-openapi-ts/toTsByPath";
+import apiTS from "./mp-openapi-ts/index";
 import prettier from "prettier";
 import parserTypescript from "prettier/parser-typescript";
-const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenAPI JSON
-(function () {
-  // const path = "/biz/comtywhiteaccount/addWhiteAccount";
-  // const path = "/biz/community/pageFunds";
-  // const path = "/biz/customer/abdUser";
-  // const path = "/biz/comtywhiteaccount/searchAccountByPhone";
-  const path = "";
+
+// (function () {
+
+// })();
+
+export default function writeTsFile(path?: string) {
+  const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenAPI JSON
   const outputStr = apiTS(schema, path);
   const { other, output } = outputStr;
-
-  fs.writeFileSync("output/test-my.ts", output + other);
-})();
+  // prettierStr(output + other)
+  fs.writeFileSync("dist/test-my.ts", output + other);
+}
 
 function prettierStr(output: string) {
   let prettierOptions: prettier.Options = {
