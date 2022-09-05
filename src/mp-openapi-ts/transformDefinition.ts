@@ -1,12 +1,14 @@
 import { parseSchemaReferenceObject } from "./index";
 import { OpenAPI2, ReferenceObject, RefTree } from "./types";
-import { parseRef } from "./utils";
+import { comment, parseRef } from "./utils";
 
 const refTreeMap = new Map<string, RefTree>();
-// 解析存储的definitoin数据
+// 解析存储的definitoin数据，并生成ts文件
 export function parseRefRecordObj(globalSchemeObj: OpenAPI2) {
   let output = "";
   for (const [key, value] of refTreeMap) {
+    // 如果在黑名单内，不需要生成对应的interface
+    if (isExsitBlackList(value.refPartName)) continue;
     if (!value.interfaceStr) {
       // 生成接口(interfaceStr)
       value.interfaceStr += createTypeStrByDefinition(value, globalSchemeObj);
@@ -28,7 +30,12 @@ export function transfromReferenceObj(schema: ReferenceObject): string {
     return setRefMap(partStr)!.formatName;
   }
 }
-
+// 表示不需要保存/生成这个数据结构的interface
+function isExsitBlackList(refName: string): boolean {
+  const blackListDataStructure = [/Map/g];
+  return blackListDataStructure.some((regItem) => regItem.test(refName));
+}
+// 保存ref对应的definition
 function setRefMap(refName: string) {
   let newStr = formatDefinitionName(refName);
   const res = newStr.match(/((?!\<).*?)\<((?!\>).*?)\>$/);
@@ -39,7 +46,23 @@ function setRefMap(refName: string) {
     interfaceName: res ? `${res[1]}<T = ${res[2]}>` : newStr,
   });
   return refTreeMap.get(refName);
+  //   if (blackListDataStructure.some((regItem) => regItem.test(refName))) {
+  //     return {
+  //       formatName: newStr,
+  //     };
+  //   } else {
+  //     const res = newStr.match(/((?!\<).*?)\<((?!\>).*?)\>$/);
+  //     refTreeMap.set(refName, {
+  //       refPartName: refName,
+  //       interfaceStr: "",
+  //       formatName: newStr,
+  //       interfaceName: res ? `${res[1]}<T = ${res[2]}>` : newStr,
+  //     });
+  //     return refTreeMap.get(refName);
+  //   }
 }
+// 格式化definitions中的名字；
+// 名字包括：中文，()，
 let chineseGeneriIndex = 1;
 function formatDefinitionName(refName: string) {
   let newStr = refName
@@ -67,7 +90,8 @@ function formatDefinitionName(refName: string) {
 function createTypeStrByDefinition(refTreeObj: RefTree, schemaObj: OpenAPI2) {
   if (!schemaObj.definitions) return "";
   const { interfaceName, refPartName } = refTreeObj;
-  let output = `interface ${interfaceName} {\n`;
+  let output = `${comment(refPartName)}`;
+  output += `interface ${interfaceName} {\n`;
   const definitionObj = schemaObj.definitions[refPartName];
   output += parseSchemaReferenceObject(definitionObj);
   output += `\n };`;

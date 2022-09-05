@@ -12,7 +12,7 @@ export default function writeTsFile(path?: string) {
   const outputStr = apiTS(schema, path);
   const { other, output } = outputStr;
   // prettierStr(output + other)
-  fs.writeFileSync("dist/test-my.ts", output + other);
+  fs.writeFileSync("dist/test-my.ts", prettierStr(output + other));
 }
 
 function prettierStr(output: string) {
