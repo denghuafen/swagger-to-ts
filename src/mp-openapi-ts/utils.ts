@@ -402,49 +402,49 @@ export function dealInterfaceName(interfaceName: string) {
   return interfaceName;
 }
 
-let chineseGeneriIndex = 1;
+// let chineseGeneriIndex = 1;
 
 export const sourceMapTarget = new Map<string, SourceTargetMap>();
-export function transformChart(sourceStr: string, interfaceStr: string = "") {
-  // 包含中文字符
-  const includeChinese = /[\u4e00-\u9fa5]/g;
-  // 全是中文字符
-  // const allChinese = /^[\u4e00-\u9fa5]+$/g;
-  // 包含括号
-  const includeParentheses = /\(|\)/g;
-  let target = "";
-  if (includeParentheses.test(sourceStr) || includeChinese.test(sourceStr)) {
-    const targetObj = sourceMapTarget.get(sourceStr);
-    if (targetObj && targetObj.target) {
-      // target = sourceMapTarget.get(sourceStr).target;
-      target = targetObj.target;
-    } else {
-      target = `Custom${chineseGeneriIndex++}`;
-      sourceMapTarget.set(sourceStr, {
-        source: sourceStr,
-        target,
-        interfaceStr,
-      });
-    }
-  }
-  return target;
-}
+// export function transformChart(sourceStr: string, interfaceStr: string = "") {
+//   // 包含中文字符
+//   const includeChinese = /[\u4e00-\u9fa5]/g;
+//   // 全是中文字符
+//   // const allChinese = /^[\u4e00-\u9fa5]+$/g;
+//   // 包含括号
+//   const includeParentheses = /\(|\)/g;
+//   let target = "";
+//   if (includeParentheses.test(sourceStr) || includeChinese.test(sourceStr)) {
+//     const targetObj = sourceMapTarget.get(sourceStr);
+//     if (targetObj && targetObj.target) {
+//       // target = sourceMapTarget.get(sourceStr).target;
+//       target = targetObj.target;
+//     } else {
+//       target = `Custom${chineseGeneriIndex++}`;
+//       sourceMapTarget.set(sourceStr, {
+//         source: sourceStr,
+//         target,
+//         interfaceStr,
+//       });
+//     }
+//   }
+//   return target;
+// }
 // 处理数据结构名称
-export function formatDataStrucName(interName: string) {
-  const reg = /((?!\<).*?)\<((?!\>).*?)\>$/;
-  const result = interName.match(reg);
-  if (result) {
-    const subGroup = result[1];
-    const subGroupGeneric = result[2];
-    interName = `${transformChart(subGroup)}<${formatDataStrucName(
-      subGroupGeneric
-    )}>`;
-  } else {
-    // 没有泛型
-    interName = transformChart(interName);
-  }
-  return interName;
-}
+// export function formatDataStrucName(interName: string) {
+//   const reg = /((?!\<).*?)\<((?!\>).*?)\>$/;
+//   const result = interName.match(reg);
+//   if (result) {
+//     const subGroup = result[1];
+//     const subGroupGeneric = result[2];
+//     interName = `${transformChart(subGroup)}<${formatDataStrucName(
+//       subGroupGeneric
+//     )}>`;
+//   } else {
+//     // 没有泛型
+//     interName = transformChart(interName);
+//   }
+//   return interName;
+// }
 // 是否包含类似的泛型的结构
 export function isGeneric(name: string) {
   const reg = /((?!\«).*?)\«((?!\»).*?)\»$/;
@@ -460,26 +460,28 @@ export function createGenericInterfaceName(name: string) {
 export function isReferenObj(items?: SchemaObject | ReferenceObject) {
   return items && !!(items as ReferenceObject).$ref;
 }
-// export function parseRefPartsName(refPartsName: string) {
-//   // 生成数据结构
-//   function parseGeneric(name: string): RefParts {
-//     const reg = /((?!\«).*?)\«((?!\»).*?)\»$/;
-//     const nameRegArr = name.match(reg);
-//     if (nameRegArr) {
-//       const childrenAim = [];
-//       childrenAim.push(parseGeneric(nameRegArr[2]));
-//       return {
-//         name: nameRegArr[1],
-//         children: childrenAim,
-//       };
-//     } else {
-//       return { name: name, children: [] };
-//     }
-//   }
 
-//   const result = parseGeneric(refPartsName);
-//   console.dir(result);
-//   console.log(result.children[0].children);
-
-//   return result;
-// }
+// 格式化definitions中的名字；
+// 名字包括：中文，()，
+let chineseGeneriIndex = 1;
+export function formatDefinitionName(refName: string) {
+  let newStr = refName
+    .replace(/«/g, "<")
+    .replace(/»/g, ">")
+    .replace(/List/g, "Array")
+    .replace(/Map/g, "Record")
+    .replace(/<Void>/g, "");
+  // 包含中文字符
+  const includeChinese = /[\u4e00-\u9fa5]/g;
+  // 全是中文字符
+  const allChinese = /^[\u4e00-\u9fa5]+$/g;
+  // 包含括号
+  const includeParentheses = /\(|\)/g;
+  if (allChinese.test(newStr)) {
+    newStr = newStr.replace(allChinese, `Custom${chineseGeneriIndex++}`);
+  }
+  if (includeParentheses.test(newStr) || includeChinese.test(newStr)) {
+    newStr = newStr.replace(includeChinese, "").replace(includeParentheses, "");
+  }
+  return newStr;
+}

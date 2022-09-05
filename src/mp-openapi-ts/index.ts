@@ -1,17 +1,15 @@
 import {
   parseRefRecordObj,
-  transfromReferenceObj,
 } from "./transformDefinition";
+import parseSchemaReferenceObject from "./transformSchemaOrRef";
 import {
   OpenAPI2,
   ParameterObject,
   PathItemObject,
   ReferenceObject,
-  RefTree,
   ResponseObject,
-  SchemaObject,
 } from "./types";
-import { comment, parseRef, tsType, upperCamelCaseByPath } from "./utils";
+import { comment, tsType, upperCamelCaseByPath } from "./utils";
 const httpMethods = [
   "get",
   "put",
@@ -156,51 +154,5 @@ function transformResponse(
 
   return output;
 }
-// 分类处理不同的schema描述对象
-export function parseSchemaReferenceObject(
-  schema?: SchemaObject | ReferenceObject
-): string {
-  if (!schema) return "";
-  if ((schema as ReferenceObject).$ref) {
-    return transfromReferenceObj(schema as ReferenceObject);
-  } else {
-    const { properties } = schema as SchemaObject;
-    if (properties) {
-      return transformProps(properties);
-    } else {
-      return transformSchemaObj(schema as SchemaObject);
-    }
-  }
-}
 
-function transformProps(
-  properties: Record<string, ReferenceObject | SchemaObject>
-) {
-  let output = "";
-  Object.keys(properties).forEach((propKey) => {
-    const { description } = properties[propKey] as SchemaObject;
-    if (description) {
-      output += `${comment(description)}`;
-    }
-    output += `  ${propKey}?: ${parseSchemaReferenceObject(
-      properties[propKey]
-    )}\n`;
-  });
-  return output;
-}
-// 是作为属性key的value存在的
-// 处理普通的schema的数据结构
-export function transformSchemaObj(schema: SchemaObject): string {
-  let output = "";
-  const { type, items, enum: enumKeys } = schema;
-  const tsTypeVal = tsType(type);
-  if (tsTypeVal === "Array") {
-    output += `Array<${parseSchemaReferenceObject(items)}>`;
-  } else if (enumKeys) {
-    output += `${enumKeys.map((item) => `"${item}"`).join("|")}`;
-  } else {
-    output += `${tsTypeVal}`;
-  }
 
-  return output;
-}
