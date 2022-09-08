@@ -59,6 +59,18 @@
             "args": [
                 "${workspaceFolder}/src/mp-openapi-ts/test/index.spec.ts"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "entry-point",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/index.ts"
+            ]
         }
     ]
 }

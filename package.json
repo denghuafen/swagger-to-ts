@@ -6,9 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "test": "ts-node ./src/mp-openapi-ts/test/index.spec.ts",
-    "output:other":"ts-node ./src/toTs.ts",
-    "output:my":"ts-node ./src/toTsMy.ts",
-    "output":"ts-node ./src/index.ts"
+    "output:other": "ts-node ./src/toTs.ts",
+    "output:my": "ts-node ./src/toTsMy.ts",
+    "output": "ts-node ./src/index.ts"
   },
   "author": "",
   "license": "ISC",

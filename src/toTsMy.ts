@@ -2,12 +2,15 @@ import fs from "fs";
 import apiTS from "./mp-openapi-ts/index";
 import prettier from "prettier";
 import parserTypescript from "prettier/parser-typescript";
-
+// const jsonfile = require('jsonfile');
+// import jsonfile from "jsonfile";
 // (function () {
 
 // })();
 
 export default function writeTsFile(path?: string) {
+  // console.error("hello");
+  // const schema = jsonfile.readFileSync("project-openapi.json");
   const schema = fs.readFileSync("project-openapi.json", "utf8"); // must be OpenAPI JSON
   const outputStr = apiTS(schema, path);
   const { other, output } = outputStr;
