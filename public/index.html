@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+    <style>
+        #url {
+            width: 600px;
+        }
+        /* #submit {
+            float: right;
+        } */
+    </style>
+</head>
+
+<body>
+    <div>
+        <h3>swagger-doc的URL</h3>
+        <input type="text" value="http://wenwo-cloud-adaptor-biz-domain-platform-test.wenwo.cn/v2/api-docs"
+            placeholder="url" id="url">
+    </div>
+    <div>
+        <h3>swagger具体的请求路径</h3>
+        <select name="path" id="path">
+            <option value="">请选择</option>
+        </select>
+    </div>
+    
+    <div>
+        <h3>代码 <button id="submit">确定</button></h3>
+        <pre><code class="TypeScript" id="tsCode">interface Hello{name: string;}</code></pre>
+    </div>
+    
+    <iframe src="" frameborder="0" name="myframe" style="display: none;"></iframe>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+    <script>
+        const urlDom = document.getElementById("url");
+        urlDom.addEventListener("blur", async (ele) => {
+            console.log(ele);
+            const swaggerUrl = ele.target.value;
+            const res = await axios.post("/getApiData", {
+                url: swaggerUrl
+            });
+            const { data } = res;
+            initPathSelect(data);
+            console.log(swaggerUrl, res);
+        })
+        function initPathSelect(data) {
+            const pathDom = document.getElementById("path");
+            data.forEach(item => {
+                const optEle = document.createElement("option")
+                optEle.value = item;
+                optEle.innerText = item;
+                pathDom.appendChild(optEle);
+            })
+
+        }
+        const submitEle = document.getElementById("submit");
+        submitEle.addEventListener("click", async () => {
+            const pathDom = document.getElementById("path");
+            const index = pathDom.selectedIndex
+            const path = pathDom.options[index].value 
+            const res = await axios.post("/getTs", {
+                path
+            });
+            const strTs = res.data;
+            document.getElementById("tsCode").innerHTML = hljs.highlight(strTs,{language:"TypeScript"}).value;;
+            console.log(res,"..res");
+            // console.log(pathDom, index, "..e.e..",path)
+        })
+    </script>
+</body>
+
+</html>

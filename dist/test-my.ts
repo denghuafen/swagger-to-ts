@@ -1,19 +1,15 @@
-/** /biz/comtywhiteaccount/addWhiteAccount */
-namespace BizComtywhiteaccountAddWhiteAccount {
-  /** 添加社区白名单账号 */
+/** /biz/application/pageCoinTradList */
+namespace BizApplicationPageCoinTradList {
   type RequestParamsType = {
-    /** request */
-    request?: AddWhiteAccountRequest;
-    /** userId */
-    userId?: string;
+    /** pageCoinTradListFrm */
+    pageCoinTradListFrm?: PageCoinTradArrayFrm;
   };
   /** OK */
-  type ResponseDataType = ResultVO;
-  /** AddWhiteAccountRequest */
-  interface AddWhiteAccountRequest {
-    bcustomerId?: string;
-    /** 手机号 */
-    phone?: string;
+  type ResponseDataType = PageVO<CoinTradVO>;
+  /** AdminRoleDelRequest */
+  interface AdminRoleDelRequest {
+    /** 主键id */
+    roleId?: string;
   }
   /** ResultVO«Void» */
   interface ResultVO {
@@ -21,5 +17,48 @@ namespace BizComtywhiteaccountAddWhiteAccount {
     message?: string;
     /** 请求状态码，200-正确，其它-错误 */
     status?: number;
+  }
+  /** PageCoinTradListFrm */
+  interface PageCoinTradArrayFrm {
+    /** 社区id */
+    communityId?: string;
+    /** 页码，从 1 开始 */
+    pageNum?: number;
+    /** 每页大小 */
+    pageSize?: number;
+  }
+  /** PageVO«CoinTradVO» */
+  interface PageVO<T = CoinTradVO> {
+    /** 下一页页码，没有下一页返回 -1 */
+    nextPageNum?: number;
+    /** 页序数 */
+    pageNum?: number;
+    /** 当页记录数量 */
+    pageSize?: number;
+    /** 当前页元素 */
+    rows?: Array<CoinTradVO>;
+    /** 记录总数 */
+    total?: number;
+    /** 总页数 */
+    totalPage?: number;
+  }
+  /** CoinTradVO */
+  interface CoinTradVO {
+    /** 可用金币 */
+    availableCoins?: string;
+    /** 交易金币 */
+    coinTrad?: string;
+    /** 冻结金币 */
+    frozenCoins?: string;
+    /** 主键ID */
+    id?: string;
+    /** 付款人 */
+    payOrIncome?: string;
+    /** 状态 */
+    status?: string;
+    /** 交易时间 */
+    tradTime?: string;
+    /** 交易类型 */
+    tradType?: string;
   }
 }
