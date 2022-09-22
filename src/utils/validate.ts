@@ -1,10 +1,11 @@
+import CircularJSON from "circular-json";
 export function isJson(aim: unknown) {
   if (typeof aim === "string") {
     try {
-      JSON.parse(aim);
+      CircularJSON.parse(aim);
       return true;
     } catch (error) {
-      return;
+      return false;
     }
   } else {
     return false;

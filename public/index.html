@@ -20,8 +20,10 @@
 <body>
     <div>
         <h3>swagger-doc的URL</h3>
-        <input type="text" value="http://wenwo-cloud-adaptor-biz-domain-platform-test.wenwo.cn/v2/api-docs"
+        <input type="text" value="http://wenwo-cloud-adaptor-biz-domain-community-dev.wenwo.cn/v2/api-docs"
             placeholder="url" id="url">
+        <!-- <input type="text" value="http://wenwo-cloud-adaptor-biz-domain-platform-test.wenwo.cn/v2/api-docs"
+            placeholder="url" id="url"> -->
     </div>
     <div>
         <h3>swagger具体的请求路径</h3>
@@ -46,7 +48,7 @@
         urlDom.addEventListener("blur", async (ele) => {
             console.log(ele);
             const swaggerUrl = ele.target.value;
-            const res = await axios.post("/getApiData", {
+            const res = await axios.post("/my-ts/getApiData", {
                 url: swaggerUrl
             });
             const { data } = res;
@@ -68,7 +70,7 @@
             const pathDom = document.getElementById("path");
             const index = pathDom.selectedIndex
             const path = pathDom.options[index].value 
-            const res = await axios.post("/getTs", {
+            const res = await axios.post("/my-ts/getTs", {
                 path
             });
             const strTs = res.data;

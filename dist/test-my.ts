@@ -1,64 +1,49 @@
-/** /biz/application/pageCoinTradList */
-namespace BizApplicationPageCoinTradList {
+/** /bizc/index/getNewAssetsOverviewData */
+namespace BizcIndexGetNewAssetsOverviewData {
   type RequestParamsType = {
-    /** pageCoinTradListFrm */
-    pageCoinTradListFrm?: PageCoinTradArrayFrm;
+    /** request */
+    request?: IndexMenuDataRequest;
   };
   /** OK */
-  type ResponseDataType = PageVO<CoinTradVO>;
-  /** AdminRoleDelRequest */
-  interface AdminRoleDelRequest {
-    /** 主键id */
-    roleId?: string;
+  type ResponseDataType = IndexMenuDataResponse;
+  /** String */
+  interface String {}
+  /** list */
+  interface list {}
+  /** InviteDoctorRequest */
+  interface InviteDoctorRequest {
+    /** 机构id */
+    bId?: string;
+    /** 社区ID */
+    comtyId?: string;
+    /** 手机号_医生名称,手机号_医生名称 */
+    mobileList?: string;
   }
-  /** ResultVO«Void» */
-  interface ResultVO {
+  /** ResultVO«string» */
+  interface ResultVO<T = string> {
+    /** 响应数据：成功时返回需要的数据，失败时返回详细原因或为null */
+    data?: string;
     /** 请求状态描述 */
     message?: string;
     /** 请求状态码，200-正确，其它-错误 */
     status?: number;
   }
-  /** PageCoinTradListFrm */
-  interface PageCoinTradArrayFrm {
+  /** IndexMenuDataRequest */
+  interface IndexMenuDataRequest {
     /** 社区id */
     communityId?: string;
-    /** 页码，从 1 开始 */
-    pageNum?: number;
-    /** 每页大小 */
-    pageSize?: number;
   }
-  /** PageVO«CoinTradVO» */
-  interface PageVO<T = CoinTradVO> {
-    /** 下一页页码，没有下一页返回 -1 */
-    nextPageNum?: number;
-    /** 页序数 */
-    pageNum?: number;
-    /** 当页记录数量 */
-    pageSize?: number;
-    /** 当前页元素 */
-    rows?: Array<CoinTradVO>;
-    /** 记录总数 */
-    total?: number;
-    /** 总页数 */
-    totalPage?: number;
-  }
-  /** CoinTradVO */
-  interface CoinTradVO {
-    /** 可用金币 */
-    availableCoins?: string;
-    /** 交易金币 */
-    coinTrad?: string;
-    /** 冻结金币 */
-    frozenCoins?: string;
-    /** 主键ID */
-    id?: string;
-    /** 付款人 */
-    payOrIncome?: string;
-    /** 状态 */
-    status?: string;
-    /** 交易时间 */
-    tradTime?: string;
-    /** 交易类型 */
-    tradType?: string;
+  /** IndexMenuDataResponse */
+  interface IndexMenuDataResponse {
+    /** 医生总量 */
+    doctorNum?: number;
+    /** O2O预约订单总数 */
+    orderNum?: number;
+    /** 商品总量 */
+    productNum?: number;
+    /** 服务用户总量 */
+    serviceUserNum?: number;
+    /** 访问总量 */
+    visitNum?: number;
   }
 }

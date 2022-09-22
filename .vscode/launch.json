@@ -3,6 +3,18 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "service-path",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/service/index.ts"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Program",
             "runtimeArgs": [
                 "-r",

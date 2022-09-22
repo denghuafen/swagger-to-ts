@@ -32,3 +32,13 @@ schema 表示数据的数据结构，数据结构为对象
 
 
 ## 如何加载一个网页icon
+
+
+## 问题记录
+1、 JSON格式转化的循环引用 参考文章： https://blog.csdn.net/qq_34917408/article/details/107406493
+2、 
+    api：http://wenwo-cloud-adaptor-biz-domain-community-dev.wenwo.cn/v2/api-docs   
+    path:  /bizc/index/getNewAssetsOverviewData
+    问题一、返回的interface ResultVO<T = string> data中为啥没有应用泛型？？
+    问题二、可以简化一下返回的类型码？只是用到了IndexMenuDataRequest ，IndexMenuDataResponse ，ResultVO。。其他的为啥也返回了？？
+    
