@@ -57,7 +57,7 @@ function transformAll(schemeObj: OpenAPI2): string {
 }
 /**
  *
- * 遇见入参、返回参数
+ * 根据请求的url为入口，解析出涉及的数据结构
  * 生成type，如:
  * type ResponseType = Cbd<Edb<AbcVO>>;
  */
@@ -69,7 +69,7 @@ function transformPathsObj(paths: Record<string, PathItemObject>): string {
     output += comment(url);
     const interfaceKey = upperCamelCaseByPath(url || `IDefault${curIndex++}`);
     output += `namespace ${interfaceKey} { \n`;
-    // 这里for循环可以删除，不影响整体结构
+    // for循环用户获取涉及的数据接口
     for (const method of httpMethods) {
       const methodItem = pathItem[method];
       if (methodItem) {
@@ -77,9 +77,11 @@ function transformPathsObj(paths: Record<string, PathItemObject>): string {
         if (description) {
           output += `  ${comment(description)}`;
         }
+        // 解析请求参数
         if (parameters) {
           output += transformParameters(parameters);
         }
+        // 解析响应参数
         output += "";
         if (responses) {
           output += transformResponse(responses);

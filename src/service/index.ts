@@ -53,7 +53,12 @@ app.post("/my-ts/getApiData", (req, res) => {
       responseType: "text",
     })
     .then((result: any) => {
-      const data = result.data;
+      let data = result.data;
+      if(typeof data==="string"){
+        console.error(data);
+        
+        data = CircularJSON.parse(data);
+      }
       const pathsArr = Object.keys(data.paths);
       res.send(JSON.stringify(pathsArr));
       console.log("执行。。。");
